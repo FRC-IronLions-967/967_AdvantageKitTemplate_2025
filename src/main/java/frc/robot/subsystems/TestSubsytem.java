@@ -4,19 +4,19 @@
 
 package frc.robot.subsystems;
 
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkClosedLoopController;
+import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkFlexConfig;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class TestSubsytem extends SubsystemBase {
   /** Creates a new TestSubsytem. */
   private SparkFlex roller;
+
   private SparkFlexConfig rollerConfig;
   private SparkClosedLoopController rollerController;
 

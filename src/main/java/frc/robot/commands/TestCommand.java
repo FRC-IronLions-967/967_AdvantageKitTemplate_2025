@@ -5,12 +5,21 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.subsystems.TestSubsytem;
 
 /* You should consider using the more terse Command factories API instead https://docs.wpilib.org/en/stable/docs/software/commandbased/organizing-command-based.html#defining-commands */
 public class TestCommand extends Command {
   /** Creates a new TestCommand. */
-  public TestCommand() {
+
+  private TestSubsytem testSubsytem;
+  private double speed;
+
+  public TestCommand(TestSubsytem testSubsytem, double speed) {
     // Use addRequirements() here to declare subsystem dependencies.
+
+    this.testSubsytem = testSubsytem;
+    this.speed = speed;
+    addRequirements(testSubsytem);
   }
 
   // Called when the command is initially scheduled.
@@ -19,7 +28,9 @@ public class TestCommand extends Command {
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
-  public void execute() {}
+  public void execute() {
+    testSubsytem.runRoller(speed);
+  }
 
   // Called once the command ends or is interrupted.
   @Override
@@ -28,6 +39,6 @@ public class TestCommand extends Command {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return true;
   }
 }
