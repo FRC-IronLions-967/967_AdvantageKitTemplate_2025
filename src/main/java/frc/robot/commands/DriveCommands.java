@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
+import frc.robot.subsystems.vision.ObjectDetection;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -48,7 +49,18 @@ public class DriveCommands {
   private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
   private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
-  private DriveCommands() {}
+  private static ProfiledPIDController angleController;
+
+  private DriveCommands() {
+    // Create PID controller
+    angleController =
+        new ProfiledPIDController(
+            ANGLE_KP,
+            0.0,
+            ANGLE_KD,
+            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+    angleController.enableContinuousInput(-Math.PI, Math.PI);
+  }
 
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
     // Apply deadband
@@ -114,15 +126,6 @@ public class DriveCommands {
       DoubleSupplier ySupplier,
       Supplier<Rotation2d> rotationSupplier) {
 
-    // Create PID controller
-    ProfiledPIDController angleController =
-        new ProfiledPIDController(
-            ANGLE_KP,
-            0.0,
-            ANGLE_KD,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
-    angleController.enableContinuousInput(-Math.PI, Math.PI);
-
     // Construct command
     return Commands.run(
             () -> {
@@ -154,6 +157,27 @@ public class DriveCommands {
             drive)
 
         // Reset PID controller when command starts
+        .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+  }
+
+  public static Command driveOverObject(
+      Drive drive, ObjectDetection objectDetection, double speed) {
+    return Commands.run(
+            () -> {
+              drive.runVelocity(
+                  new ChassisSpeeds(
+                      drive.getMaxLinearSpeedMetersPerSec()
+                          * speed
+                          * Math.cos(objectDetection.getObjectAngle().getRadians()),
+                      drive.getMaxLinearSpeedMetersPerSec()
+                          * speed
+                          * Math.sin(objectDetection.getObjectAngle().getRadians()),
+                      angleController.calculate(
+                          drive.getRotation().getRadians(),
+                          objectDetection.getObjectAngle().getRadians())));
+            },
+            drive,
+            objectDetection)
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
 

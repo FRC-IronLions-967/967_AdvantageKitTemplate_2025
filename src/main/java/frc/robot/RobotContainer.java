@@ -29,6 +29,7 @@ import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
+import frc.robot.subsystems.vision.ObjectDetection;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
@@ -46,6 +47,7 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Vision vision;
+  private final ObjectDetection objectDetection;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -73,6 +75,7 @@ public class RobotContainer {
                     VisionConstants.aprilTagCamera1Name, VisionConstants.robotToAprilTagCamera1),
                 new VisionIOPhotonVision(
                     VisionConstants.aprilTagCamera2Name, VisionConstants.robotToAprilTagCamera2));
+        objectDetection = new ObjectDetection();
         break;
 
       case SIM:
@@ -95,6 +98,7 @@ public class RobotContainer {
                     VisionConstants.aprilTagCamera2Name,
                     VisionConstants.robotToAprilTagCamera2,
                     drive::getPose));
+        objectDetection = new ObjectDetection();
         break;
 
       default:
@@ -107,6 +111,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {});
         vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
+        objectDetection = new ObjectDetection();
         break;
     }
 
@@ -171,6 +176,15 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+
+    // Run over an object using object detection
+    controller
+        .rightBumper()
+        .whileTrue(
+            DriveCommands.driveOverObject(
+                drive, 
+                objectDetection, 
+                0.5));
   }
 
   /**
