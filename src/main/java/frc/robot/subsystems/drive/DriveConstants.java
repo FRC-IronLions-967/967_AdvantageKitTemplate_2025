@@ -66,8 +66,8 @@ public class DriveConstants {
       (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM -> Wheel Rad/Sec
 
   // Drive PID configuration
-  public static final double driveKp = 0.0;
-  public static final double driveKd = 0.0;
+  public static final double driveKp = 0.01;
+  public static final double driveKd = 0.005;
   public static final double driveKs = 0.0;
   public static final double driveKv = 0.1;
   public static final double driveSimP = 0.05;
@@ -76,7 +76,7 @@ public class DriveConstants {
   public static final double driveSimKv = 0.0789;
 
   // Turn motor configuration
-  public static final boolean turnInverted = false;
+  public static final boolean turnInverted = true;
   public static final int turnMotorCurrentLimit = 20;
   public static final double turnMotorReduction = 18.75;
   public static final DCMotor turnGearbox = DCMotor.getNeo550(1);
@@ -87,7 +87,7 @@ public class DriveConstants {
   public static final double turnEncoderVelocityFactor = (2 * Math.PI) / 60.0; // RPM -> Rad/Sec
 
   // Turn PID configuration
-  public static final double turnKp = 2.0;
+  public static final double turnKp = 1.0;
   public static final double turnKd = 0.0;
   public static final double turnSimP = 8.0;
   public static final double turnSimD = 0.0;
