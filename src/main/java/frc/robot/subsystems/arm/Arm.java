@@ -6,6 +6,8 @@ package frc.robot.subsystems.arm;
 
 import java.util.function.BooleanSupplier;
 
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase;
 import com.revrobotics.spark.SparkBase.ControlType;
@@ -205,7 +207,16 @@ public class Arm extends SubsystemBase {
     }
 
     elevatorVortexController.setReference(elevatorHeightCurrentTarget, ControlType.kPosition, ClosedLoopSlot.kSlot0, 0.09, ArbFFUnits.kPercentOut);
-    
+
+    Logger.recordOutput("Arm/Elevator/CurrentTarget", elevatorHeightCurrentTarget);
+    Logger.recordOutput("Arm/Elevator/EndGoal", elevatorHeightEndGoal);
+    Logger.recordOutput("Arm/Elevator/ActualPosition", getElevatorPosition());
+    Logger.recordOutput("Arm/RotaryArm/CurrentTarget", rotaryArmCurrentTarget);
+    Logger.recordOutput("Arm/RotaryArm/EndGoal", rotaryArmEndGoal);
+    Logger.recordOutput("Arm/RotaryArm/ActualAngle", getArmAngle());
+    Logger.recordOutput("Arm/State", state);
+    Logger.recordOutput("Arm/CoralManipuator/Coral_IN", hasCoral());
+    Logger.recordOutput("Arm/AlgaeManipulator/Algae_IN", hasAlgae());
   }
 
   public void changeStateToStartup() {
@@ -257,7 +268,7 @@ public class Arm extends SubsystemBase {
    */
   public void runCoralManipulator(double speed) {
     coralManipulatorVortexController.setReference(speed, ControlType.kVelocity);
-    // coralManipulatorVortex.set(speed);
+    Logger.recordOutput("Arm/CoralManipuator/speed", speed);
   }
 
   /**
@@ -277,11 +288,12 @@ public class Arm extends SubsystemBase {
   }
 
   /**
-   * Sets the Algae manipulator to a speed.
-   * @param speed The speed at which the wheels run.
+   * Sets the Algae manipulator to a power.
+   * @param power The power at which the wheels run.
    */
-  public void runAlgaeManipulator(double speed) {
-    algaeManipulatorVortex.set(speed);
+  public void runAlgaeManipulator(double power) {
+    algaeManipulatorVortex.set(power);
+    Logger.recordOutput("Arm/AlgaeManipulator/power", power);
   }
 
   /**
