@@ -18,9 +18,13 @@ public class VisionConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Camera names, must match names configured on coprocessor
-  public static String aprilTagCamera1Name = "aprilTagCamera1";
-  public static String aprilTagCamera2Name = "aprilTagCamera2";
-  public static String objectDetectionCameraName = "objectDetectionCamera";
+  public static final String aprilTagCamera1Name = "aprilTagCamera1";
+  public static final String aprilTagCamera2Name = "aprilTagCamera2";
+  public static final String objectDetectionCameraName = "objectDetectionCamera";
+
+  public static final int aprilTagCamera1Index = 0;
+  public static final int aprilTagCamera2Index = 1;
+  public static final int objectDetectionCameraIndex = 2;
 
   // Robot to camera transforms
   // (Not used by Limelight, configure in web UI instead)

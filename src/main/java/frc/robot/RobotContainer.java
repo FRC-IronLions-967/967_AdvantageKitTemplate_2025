@@ -29,12 +29,12 @@ import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
-import frc.robot.subsystems.vision.ObjectDetection;
 import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionAprilTagSim;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionODSim;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -47,7 +47,6 @@ public class RobotContainer {
   // Subsystems
   private final Drive drive;
   private final Vision vision;
-  private final ObjectDetection objectDetection;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -74,8 +73,10 @@ public class RobotContainer {
                 new VisionIOPhotonVision(
                     VisionConstants.aprilTagCamera1Name, VisionConstants.robotToAprilTagCamera1),
                 new VisionIOPhotonVision(
-                    VisionConstants.aprilTagCamera2Name, VisionConstants.robotToAprilTagCamera2));
-        objectDetection = new ObjectDetection();
+                    VisionConstants.aprilTagCamera2Name, VisionConstants.robotToAprilTagCamera2),
+                new VisionIOPhotonVision(
+                    VisionConstants.objectDetectionCameraName,
+                    VisionConstants.robotToObjectDetectionCamera));
         break;
 
       case SIM:
@@ -90,15 +91,17 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVisionSim(
+                new VisionIOPhotonVisionAprilTagSim(
                     VisionConstants.aprilTagCamera1Name,
                     VisionConstants.robotToAprilTagCamera1,
                     drive::getPose),
-                new VisionIOPhotonVisionSim(
+                new VisionIOPhotonVisionAprilTagSim(
                     VisionConstants.aprilTagCamera2Name,
                     VisionConstants.robotToAprilTagCamera2,
-                    drive::getPose));
-        objectDetection = new ObjectDetection();
+                    drive::getPose),
+                new VisionIOPhotonVisionODSim(
+                    VisionConstants.objectDetectionCameraName,
+                    VisionConstants.robotToObjectDetectionCamera));
         break;
 
       default:
@@ -110,8 +113,12 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        vision = new Vision(drive::addVisionMeasurement, new VisionIO() {}, new VisionIO() {});
-        objectDetection = new ObjectDetection();
+        vision =
+            new Vision(
+                drive::addVisionMeasurement,
+                new VisionIO() {},
+                new VisionIO() {},
+                new VisionIO() {});
         break;
     }
 
@@ -177,14 +184,7 @@ public class RobotContainer {
                     drive)
                 .ignoringDisable(true));
 
-    // Run over an object using object detection
-    controller
-        .rightBumper()
-        .whileTrue(
-            DriveCommands.driveOverObject(
-                drive, 
-                objectDetection, 
-                0.5));
+    controller.rightBumper().whileTrue(DriveCommands.driveOverObject(drive, vision, 0.5));
   }
 
   /**
