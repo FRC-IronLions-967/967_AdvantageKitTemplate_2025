@@ -57,7 +57,7 @@ public class DriveConstants {
   public static final int driveMotorCurrentLimit = 48;
   public static final double wheelRadiusMeters = Units.inchesToMeters(1.91);
   public static final double driveMotorReduction = 5.9;
-  public static final DCMotor driveGearbox = DCMotor.getNeoVortex(1);
+  public static final DCMotor driveGearbox = DCMotor.getNEO(1);
 
   // Drive encoder configuration
   public static final double driveEncoderPositionFactor =
