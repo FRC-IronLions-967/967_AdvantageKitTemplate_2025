@@ -34,8 +34,7 @@ import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
 import frc.robot.subsystems.vision.VisionIO;
 import frc.robot.subsystems.vision.VisionIOPhotonVision;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionAprilTagSim;
-import frc.robot.subsystems.vision.VisionIOPhotonVisionODSim;
+import frc.robot.subsystems.vision.VisionIOPhotonVisionSim;
 import java.util.Set;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -93,17 +92,18 @@ public class RobotContainer {
         vision =
             new Vision(
                 drive::addVisionMeasurement,
-                new VisionIOPhotonVisionAprilTagSim(
+                new VisionIOPhotonVisionSim(
                     VisionConstants.aprilTagCamera1Name,
                     VisionConstants.robotToAprilTagCamera1,
                     drive::getPose),
-                new VisionIOPhotonVisionAprilTagSim(
+                new VisionIOPhotonVisionSim(
                     VisionConstants.aprilTagCamera2Name,
                     VisionConstants.robotToAprilTagCamera2,
                     drive::getPose),
-                new VisionIOPhotonVisionODSim(
+                new VisionIOPhotonVisionSim(
                     VisionConstants.objectDetectionCameraName,
-                    VisionConstants.robotToObjectDetectionCamera));
+                    VisionConstants.robotToObjectDetectionCamera,
+                    drive::getPose));
         break;
 
       default:
