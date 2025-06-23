@@ -96,7 +96,7 @@ public class Drive extends SubsystemBase {
         this::getChassisSpeeds,
         this::runVelocity,
         new PPHolonomicDriveController(
-            new PIDConstants(5.0, 0.0, 0.0), new PIDConstants(5.0, 0.0, 0.0)),
+            new PIDConstants(15.0, 0.0, 1.5), new PIDConstants(10.0, 0.0, 1.0)),
         ppConfig,
         () -> DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red,
         this);
@@ -229,6 +229,20 @@ public class Drive extends SubsystemBase {
     }
     kinematics.resetHeadings(headings);
     stop();
+  }
+
+  @AutoLogOutput(key = "ClosestSideOfReef")
+  public Pose2d findClosestSideOfReef(Pose2d currentPose) {
+    Pose2d closestPose = null;
+    double minDistance = Double.MAX_VALUE;
+    for (Pose2d reefSidePose : DriveConstants.sidesOfTheReef) {
+      double distance = currentPose.getTranslation().getDistance(reefSidePose.getTranslation());
+      if (distance < minDistance) {
+        minDistance = distance;
+        closestPose = reefSidePose;
+      }
+    }
+    return closestPose;
   }
 
   /** Returns a command to run a quasistatic test in the specified direction. */
