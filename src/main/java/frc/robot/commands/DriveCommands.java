@@ -30,8 +30,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
-import frc.robot.subsystems.vision.Vision;
 import frc.robot.subsystems.vision.VisionConstants;
+import frc.robot.subsystems.vision.aprilTags.AprilTagsVision;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.LinkedList;
@@ -158,7 +158,7 @@ public class DriveCommands {
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
   }
 
-  public static Command driveOverObject(Drive drive, Vision vision, double speed) {
+  public static Command driveOverObject(Drive drive, AprilTagsVision vision, double speed) {
 
     ProfiledPIDController angleController =
         new ProfiledPIDController(

@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package frc.robot.subsystems.vision;
+package frc.robot.subsystems.vision.aprilTags;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
@@ -19,7 +19,7 @@ import java.util.Set;
 import org.photonvision.PhotonCamera;
 
 /** IO implementation for real PhotonVision hardware. */
-public class VisionIOPhotonVision implements VisionIO {
+public class AprilTagVisionIOPhotonVision implements AprilTagVisionIO {
   protected final PhotonCamera camera;
   protected final Transform3d robotToCamera;
 
@@ -29,13 +29,13 @@ public class VisionIOPhotonVision implements VisionIO {
    * @param name The configured name of the camera.
    * @param rotationSupplier The 3D position of the camera relative to the robot.
    */
-  public VisionIOPhotonVision(String name, Transform3d robotToCamera) {
+  public AprilTagVisionIOPhotonVision(String name, Transform3d robotToCamera) {
     camera = new PhotonCamera(name);
     this.robotToCamera = robotToCamera;
   }
 
   @Override
-  public void updateInputs(VisionIOInputs inputs) {
+  public void updateInputs(AprilTagVisionIOInputs inputs) {
     inputs.connected = camera.isConnected();
 
     // Read new camera observations

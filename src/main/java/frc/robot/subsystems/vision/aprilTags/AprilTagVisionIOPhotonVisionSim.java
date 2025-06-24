@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package frc.robot.subsystems.vision;
+package frc.robot.subsystems.vision.aprilTags;
 
 import static frc.robot.subsystems.vision.VisionConstants.aprilTagLayout;
 
@@ -24,7 +24,7 @@ import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.simulation.VisionTargetSim;
 
 /** IO implementation for physics sim using PhotonVision simulator. */
-public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
+public class AprilTagVisionIOPhotonVisionSim extends AprilTagVisionIOPhotonVision {
   private static VisionSystemSim visionSim;
 
   private final Supplier<Pose2d> poseSupplier;
@@ -41,7 +41,7 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
    * @param name The name of the camera.
    * @param poseSupplier Supplier for the robot pose to use in simulation.
    */
-  public VisionIOPhotonVisionSim(
+  public AprilTagVisionIOPhotonVisionSim(
       String name, Transform3d robotToCamera, Supplier<Pose2d> poseSupplier) {
     super(name, robotToCamera);
     this.poseSupplier = poseSupplier;
@@ -60,7 +60,7 @@ public class VisionIOPhotonVisionSim extends VisionIOPhotonVision {
   }
 
   @Override
-  public void updateInputs(VisionIOInputs inputs) {
+  public void updateInputs(AprilTagVisionIOInputs inputs) {
     Pose2d[] objectPoses = new Pose2d[targets.length];
     for (int i = 0; i < targets.length; i++) {
       objectPoses[i] =
