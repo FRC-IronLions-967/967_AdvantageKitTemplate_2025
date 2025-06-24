@@ -5,7 +5,7 @@
 // license that can be found in the LICENSE file
 // at the root directory of this project.
 
-package frc.robot.subsystems.vision.aprilTags;
+package frc.robot.subsystems.vision;
 
 import static frc.robot.subsystems.vision.VisionConstants.*;
 
@@ -19,25 +19,25 @@ import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.wpilibj.Alert;
 import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.subsystems.vision.aprilTags.AprilTagVisionIO.PoseObservationType;
+import frc.robot.subsystems.vision.VisionIO.PoseObservationType;
 import java.util.LinkedList;
 import java.util.List;
 import org.littletonrobotics.junction.Logger;
 
-public class AprilTagsVision extends SubsystemBase {
+public class Vision extends SubsystemBase {
   private final VisionConsumer consumer;
-  private final AprilTagVisionIO[] io;
-  private final AprilTagVisionIOInputsAutoLogged[] inputs;
+  private final VisionIO[] io;
+  private final VisionIOInputsAutoLogged[] inputs;
   private final Alert[] disconnectedAlerts;
 
-  public AprilTagsVision(VisionConsumer consumer, AprilTagVisionIO... io) {
+  public Vision(VisionConsumer consumer, VisionIO... io) {
     this.consumer = consumer;
     this.io = io;
 
     // Initialize inputs
-    this.inputs = new AprilTagVisionIOInputsAutoLogged[io.length];
+    this.inputs = new VisionIOInputsAutoLogged[io.length];
     for (int i = 0; i < inputs.length; i++) {
-      inputs[i] = new AprilTagVisionIOInputsAutoLogged();
+      inputs[i] = new VisionIOInputsAutoLogged();
     }
 
     // Initialize disconnected alerts

@@ -30,11 +30,6 @@ import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
-import frc.robot.subsystems.vision.VisionConstants;
-import frc.robot.subsystems.vision.aprilTags.AprilTagVisionIO;
-import frc.robot.subsystems.vision.aprilTags.AprilTagVisionIOPhotonVision;
-import frc.robot.subsystems.vision.aprilTags.AprilTagVisionIOPhotonVisionSim;
-import frc.robot.subsystems.vision.aprilTags.AprilTagsVision;
 import java.util.Set;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
@@ -47,7 +42,6 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
-  private final AprilTagsVision aprilTagsVision;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -67,13 +61,6 @@ public class RobotContainer {
                 new ModuleIOSpark(1),
                 new ModuleIOSpark(2),
                 new ModuleIOSpark(3));
-        aprilTagsVision =
-            new AprilTagsVision(
-                drive::addVisionMeasurement,
-                new AprilTagVisionIOPhotonVision(
-                    VisionConstants.aprilTagCamera1Name, VisionConstants.robotToAprilTagCamera1),
-                new AprilTagVisionIOPhotonVision(
-                    VisionConstants.aprilTagCamera2Name, VisionConstants.robotToAprilTagCamera2));
         break;
 
       case SIM:
@@ -85,17 +72,6 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim());
-        aprilTagsVision =
-            new AprilTagsVision(
-                drive::addVisionMeasurement,
-                new AprilTagVisionIOPhotonVisionSim(
-                    VisionConstants.aprilTagCamera1Name,
-                    VisionConstants.robotToAprilTagCamera1,
-                    drive::getPose),
-                new AprilTagVisionIOPhotonVisionSim(
-                    VisionConstants.aprilTagCamera2Name,
-                    VisionConstants.robotToAprilTagCamera2,
-                    drive::getPose));
         break;
 
       default:
@@ -107,9 +83,6 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {});
-        aprilTagsVision =
-            new AprilTagsVision(
-                drive::addVisionMeasurement, new AprilTagVisionIO() {}, new AprilTagVisionIO() {});
         break;
     }
 

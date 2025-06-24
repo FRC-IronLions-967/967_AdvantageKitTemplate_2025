@@ -12,6 +12,7 @@ import static frc.robot.subsystems.vision.VisionConstants.*;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import frc.robot.subsystems.vision.VisionIO;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.Set;
 import org.photonvision.PhotonCamera;
 
 /** IO implementation for real PhotonVision hardware. */
-public class AprilTagVisionIOPhotonVision implements AprilTagVisionIO {
+public class AprilTagVisionIOPhotonVision implements VisionIO {
   protected final PhotonCamera camera;
   protected final Transform3d robotToCamera;
 
@@ -35,7 +36,7 @@ public class AprilTagVisionIOPhotonVision implements AprilTagVisionIO {
   }
 
   @Override
-  public void updateInputs(AprilTagVisionIOInputs inputs) {
+  public void updateInputs(VisionIOInputs inputs) {
     inputs.connected = camera.isConnected();
 
     // Read new camera observations

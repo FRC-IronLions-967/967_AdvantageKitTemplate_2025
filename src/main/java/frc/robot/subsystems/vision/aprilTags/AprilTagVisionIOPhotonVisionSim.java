@@ -60,7 +60,7 @@ public class AprilTagVisionIOPhotonVisionSim extends AprilTagVisionIOPhotonVisio
   }
 
   @Override
-  public void updateInputs(AprilTagVisionIOInputs inputs) {
+  public void updateInputs(VisionIOInputs inputs) {
     Pose2d[] objectPoses = new Pose2d[targets.length];
     for (int i = 0; i < targets.length; i++) {
       objectPoses[i] =
