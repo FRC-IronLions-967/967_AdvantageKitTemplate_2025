@@ -46,7 +46,8 @@ public class ObjectDetectionVisionIOPhotonVision implements VisionIO {
       robotPose = new Pose3d(poseSupplier.get());
       cameraPose = robotPose.transformBy(robotToCamera);
       if (result.hasTargets()) {
-        inputs.objectPose = cameraPose.transformBy(result.getBestTarget().bestCameraToTarget);
+        inputs.objectPose =
+            cameraPose.transformBy(result.getBestTarget().bestCameraToTarget).toPose2d();
       } else {
         inputs.objectPose = null;
       }
