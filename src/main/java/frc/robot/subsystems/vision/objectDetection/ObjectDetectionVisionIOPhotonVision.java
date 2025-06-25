@@ -33,6 +33,7 @@ public class ObjectDetectionVisionIOPhotonVision implements VisionIO {
     inputs.connected = camera.isConnected();
 
     for (var result : camera.getAllUnreadResults()) {
+      inputs.hasTarget = result.hasTargets();
       if (result.hasTargets()) {
         inputs.latestTargetObservation =
             new TargetObservation(

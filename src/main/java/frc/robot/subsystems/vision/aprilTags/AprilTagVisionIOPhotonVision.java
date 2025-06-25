@@ -43,6 +43,7 @@ public class AprilTagVisionIOPhotonVision implements VisionIO {
     Set<Short> tagIds = new HashSet<>();
     List<PoseObservation> poseObservations = new LinkedList<>();
     for (var result : camera.getAllUnreadResults()) {
+      inputs.hasTarget = result.hasTargets();
       // Update latest target observation
       if (result.hasTargets()) {
         inputs.latestTargetObservation =

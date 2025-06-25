@@ -1,17 +1,10 @@
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot.subsystems.vision.objectDetection;
-
-import static frc.robot.subsystems.vision.VisionConstants.aprilTagLayout;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.geometry.Translation3d;
 import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 import org.photonvision.estimation.TargetModel;
@@ -20,46 +13,55 @@ import org.photonvision.simulation.SimCameraProperties;
 import org.photonvision.simulation.VisionSystemSim;
 import org.photonvision.simulation.VisionTargetSim;
 
-/** Add your docs here. */
 public class ObjectDetectionVisionIOPhotonVisionSim extends ObjectDetectionVisionIOPhotonVision {
-  private static VisionSystemSim visionSim;
-
-  private Supplier<Pose2d> poseSupplier;
+  private final VisionSystemSim simSystem;
   private final PhotonCameraSim cameraSim;
-  private TargetModel coralModel = new TargetModel(0.4, 0.3);
-  private VisionTargetSim[] targets = {
-    new VisionTargetSim(new Pose3d(new Translation3d(1, 1, 0), new Rotation3d()), coralModel),
-    new VisionTargetSim(new Pose3d(new Translation3d(1, 7, 0), new Rotation3d()), coralModel)
-  };
+  private final Supplier<Pose2d> poseSupplier;
+  private final VisionTargetSim[] objectTargets;
 
   public ObjectDetectionVisionIOPhotonVisionSim(
       String name, Transform3d robotToCamera, Supplier<Pose2d> poseSupplier) {
     super(name, robotToCamera, poseSupplier);
     this.poseSupplier = poseSupplier;
 
-    // Initialize vision sim
-    if (visionSim == null) {
-      visionSim = new VisionSystemSim("main");
-      visionSim.addAprilTags(aprilTagLayout);
-      visionSim.addVisionTargets("DetectedObjects", targets);
-    }
+    // Sim system *without* AprilTags
+    simSystem = new VisionSystemSim("objectDetectionOnly");
 
-    // Add sim camera
-    var cameraProperties = new SimCameraProperties();
-    cameraSim = new PhotonCameraSim(camera, cameraProperties, aprilTagLayout);
-    visionSim.addCamera(cameraSim, robotToCamera);
+    // Define objects to detect (could be coral, cubes, etc.)
+    objectTargets =
+        new VisionTargetSim[] {
+          new VisionTargetSim(new Pose3d(1, 5.0, 0.2, new Rotation3d()), new TargetModel(0.3, 0.3)),
+          new VisionTargetSim(new Pose3d(1, 1.0, 0.2, new Rotation3d()), new TargetModel(0.3, 0.3)),
+          new VisionTargetSim(
+              new Pose3d(-2.0, 0.0, 0.0, new Rotation3d()),
+              new TargetModel(0.3, 0.3)) // 2 meters behind robot
+        };
+    simSystem.addVisionTargets("DetectedObjects", objectTargets);
+
+    // Set up camera
+    var props = new SimCameraProperties();
+    props.setFPS(30);
+    props.setCalibration(640, 480, new Rotation2d(Math.PI / 3));
+
+    cameraSim = new PhotonCameraSim(super.camera, props, null);
+    cameraSim.setMinTargetAreaPixels(0); // or something small
+    cameraSim.setMaxSightRange(10.0); // meters
+    simSystem.addCamera(cameraSim, robotToCamera);
   }
 
   @Override
   public void updateInputs(VisionIOInputs inputs) {
-    Pose2d[] objectPoses = new Pose2d[targets.length];
-    for (int i = 0; i < targets.length; i++) {
+    Pose2d[] objectPoses = new Pose2d[objectTargets.length];
+    for (int i = 0; i < objectTargets.length; i++) {
       objectPoses[i] =
-          new Pose2d(targets[i].getPose().getX(), targets[i].getPose().getY(), new Rotation2d());
+          new Pose2d(
+              objectTargets[i].getPose().getX(),
+              objectTargets[i].getPose().getY(),
+              new Rotation2d());
     }
     Logger.recordOutput("Vision/Coral", objectPoses);
 
-    visionSim.update(poseSupplier.get());
+    simSystem.update(poseSupplier.get());
     super.updateInputs(inputs);
   }
 }
