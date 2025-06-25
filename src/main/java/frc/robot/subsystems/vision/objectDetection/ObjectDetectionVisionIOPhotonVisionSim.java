@@ -32,9 +32,7 @@ public class ObjectDetectionVisionIOPhotonVisionSim extends ObjectDetectionVisio
         new VisionTargetSim[] {
           new VisionTargetSim(new Pose3d(1, 5.0, 0.2, new Rotation3d()), new TargetModel(0.3, 0.3)),
           new VisionTargetSim(new Pose3d(1, 1.0, 0.2, new Rotation3d()), new TargetModel(0.3, 0.3)),
-          new VisionTargetSim(
-              new Pose3d(-2.0, 0.0, 0.0, new Rotation3d()),
-              new TargetModel(0.3, 0.3)) // 2 meters behind robot
+          new VisionTargetSim(new Pose3d(-2.0, 0.0, 0.0, new Rotation3d()), new TargetModel(0.3, 0.3)) // 2 meters behind robot
         };
     simSystem.addVisionTargets("DetectedObjects", objectTargets);
 
