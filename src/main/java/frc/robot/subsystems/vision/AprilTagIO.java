@@ -20,7 +20,7 @@ public interface AprilTagIO {
 
   public static record TargetInfo(int tagID, Rotation3d targetRot, double distanceToTarget) {}
 
-  public static record PoseObservation(double ambiguity, Pose3d pose) {}
+  public static record PoseObservation(double ambiguity, Pose3d pose, boolean hasTags) {}
 
   public default void updateInputs(AprilTagIOInputs inputs) {}
 }

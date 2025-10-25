@@ -22,4 +22,8 @@ public class VisionConstants {
 
   public static final AprilTagFieldLayout kTagLayout =
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
+  //Tuning constants
+  public static final double maxAmbiguity = 0.3;
+  public static final double maxZError = 0.75;
 }
