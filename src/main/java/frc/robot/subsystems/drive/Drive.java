@@ -44,6 +44,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
+import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -58,6 +59,9 @@ public class Drive extends SubsystemBase {
   private final SysIdRoutine sysId;
   private final Alert gyroDisconnectedAlert =
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
+
+  private final boolean visionPresent;
+  private final AprilTagVision vision;
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = new Rotation2d();
@@ -76,7 +80,8 @@ public class Drive extends SubsystemBase {
       ModuleIO flModuleIO,
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
-      ModuleIO brModuleIO) {
+      ModuleIO brModuleIO,
+      AprilTagVision vision) {
     this.gyroIO = gyroIO;
     modules[0] = new Module(flModuleIO, 0);
     modules[1] = new Module(frModuleIO, 1);
@@ -121,6 +126,19 @@ public class Drive extends SubsystemBase {
                 (state) -> Logger.recordOutput("Drive/SysIdState", state.toString())),
             new SysIdRoutine.Mechanism(
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
+
+    // Vision
+    this.vision = vision;
+    visionPresent = vision != null;
+  }
+
+  public Drive(
+      GyroIO gyroIO,
+      ModuleIO flModuleIO,
+      ModuleIO frModuleIO,
+      ModuleIO blModuleIO,
+      ModuleIO brModuleIO) {
+    this(gyroIO, flModuleIO, frModuleIO, blModuleIO, brModuleIO, null);
   }
 
   @Override
@@ -180,6 +198,15 @@ public class Drive extends SubsystemBase {
 
     // Update gyro alert
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
+
+    // update odemtry based on vision
+    if (visionPresent && vision.isVisionPoseGood()) {
+      poseEstimator.resetPose(
+          new Pose2d(
+              vision.getVisionPose().getX(),
+              vision.getVisionPose().getY(),
+              gyroInputs.yawPosition));
+    }
   }
 
   /**

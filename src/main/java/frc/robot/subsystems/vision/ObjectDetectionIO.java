@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import org.littletonrobotics.junction.AutoLog;
 
 /** Add your docs here. */
@@ -13,7 +13,9 @@ public interface ObjectDetectionIO {
   public static class ObjectDetectionIOInputs {
     public boolean isConnected = false;
     public boolean hasTarget = false;
-    public Rotation3d targetRot;
+    public Rotation2d xRot = new Rotation2d();
+    public Rotation2d yRot = new Rotation2d();
+    public Rotation2d zRot = new Rotation2d();
     public double distanceToTarget;
   }
 

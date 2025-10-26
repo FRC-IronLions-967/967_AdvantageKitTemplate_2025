@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import org.littletonrobotics.junction.Logger;
 
@@ -22,13 +23,56 @@ public class ObjectDetectionVision extends SubsystemBase {
     }
   }
 
+  /**
+   * @param cameraIndex which camera to use
+   * @return distance to best object
+   */
+  public double getDistanceToObject(int cameraIndex) {
+    return inputs[cameraIndex].distanceToTarget;
+  }
+
+  /**
+   * @param cameraIndex which camera to use
+   * @return a Rotation2d with yaw value
+   */
+  public Rotation2d getObjectX(int cameraIndex) {
+    return inputs[cameraIndex].xRot;
+  }
+
+  /**
+   * idk why you would use this
+   *
+   * @param cameraIndex which camera to use
+   * @return a Rotation2d with pitch value
+   */
+  public Rotation2d getObjectY(int cameraIndex) {
+    return inputs[cameraIndex].yRot;
+  }
+
+  /**
+   * only used if nonsymetic game piece
+   *
+   * @param cameraIndex which camera to use
+   * @return a Rotation2d with yaw value
+   */
+  public Rotation2d getObjectZ(int cameraIndex) {
+    return inputs[cameraIndex].zRot;
+  }
+
+  /**
+   * @param cameraIndex which camera to use
+   * @return if the camera has an object
+   */
+  public boolean hasTarget(int cameraIndex) {
+    return inputs[cameraIndex].hasTarget;
+  }
+
   @Override
   public void periodic() {
     // Update Inputs
     for (int i = 0; i < inputs.length; i++) {
       io[i].updateInputs(inputs[i]);
-      Logger.processInputs(
-          "Vision/ObjectDetection/Camera" + Integer.toString(i), inputs[i]);
+      Logger.processInputs("Vision/ObjectDetection/Camera" + Integer.toString(i), inputs[i]);
     }
   }
 }

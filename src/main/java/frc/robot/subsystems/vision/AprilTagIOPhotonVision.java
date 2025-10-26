@@ -59,7 +59,8 @@ public class AprilTagIOPhotonVision implements AprilTagIO {
           poseObservations.add(
               new PoseObservation(
                   result.multitagResult.get().estimatedPose.ambiguity,
-                  poseEstimator.update(result).get().estimatedPose, result.multitagResult.isPresent()));
+                  poseEstimator.update(result).get().estimatedPose,
+                  result.multitagResult.isPresent()));
         }
       }
       inputs.poseObservations = new PoseObservation[poseObservations.size()];

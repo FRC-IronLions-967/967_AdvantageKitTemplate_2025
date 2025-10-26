@@ -4,7 +4,7 @@
 
 package frc.robot.subsystems.vision;
 
-import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform3d;
 import org.photonvision.PhotonCamera;
 
@@ -27,10 +27,10 @@ public class ObjectDetectionIOPhotonVision implements ObjectDetectionIO {
         inputs.hasTarget = result.hasTargets();
         if (inputs.hasTarget) {
           var bestTarget = result.getBestTarget();
-          inputs.targetRot =
-              new Rotation3d(
-                  bestTarget.getYaw(),
-                  bestTarget.getPitch(),
+          inputs.xRot = Rotation2d.fromDegrees(bestTarget.getYaw());
+          inputs.yRot = Rotation2d.fromDegrees(bestTarget.getPitch());
+          inputs.zRot =
+              Rotation2d.fromDegrees(
                   bestTarget.getSkew()); // skew only used if nonsymetric game piece
           inputs.distanceToTarget =
               bestTarget
@@ -40,13 +40,17 @@ public class ObjectDetectionIOPhotonVision implements ObjectDetectionIO {
                   .toTranslation2d()
                   .getNorm();
         } else {
-          inputs.targetRot = new Rotation3d();
+          inputs.xRot = new Rotation2d();
+          inputs.yRot = new Rotation2d();
+          inputs.zRot = new Rotation2d();
           inputs.distanceToTarget = 0.0;
         }
       }
     } else {
       inputs.hasTarget = false;
-      inputs.targetRot = new Rotation3d();
+      inputs.xRot = new Rotation2d();
+      inputs.yRot = new Rotation2d();
+      inputs.zRot = new Rotation2d();
       inputs.distanceToTarget = 0.0;
     }
   }

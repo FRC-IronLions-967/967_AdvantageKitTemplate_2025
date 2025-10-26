@@ -29,6 +29,15 @@ import frc.robot.subsystems.drive.GyroIONavX;
 import frc.robot.subsystems.drive.ModuleIO;
 import frc.robot.subsystems.drive.ModuleIOSim;
 import frc.robot.subsystems.drive.ModuleIOSpark;
+import frc.robot.subsystems.vision.AprilTagIO;
+import frc.robot.subsystems.vision.AprilTagIOPhotonVision;
+import frc.robot.subsystems.vision.AprilTagIOSim;
+import frc.robot.subsystems.vision.AprilTagVision;
+import frc.robot.subsystems.vision.ObjectDetectionIO;
+import frc.robot.subsystems.vision.ObjectDetectionIOPhotonVision;
+import frc.robot.subsystems.vision.ObjectDetectionIOSim;
+import frc.robot.subsystems.vision.ObjectDetectionVision;
+import frc.robot.subsystems.vision.VisionConstants;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 
 /**
@@ -40,6 +49,8 @@ import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
 public class RobotContainer {
   // Subsystems
   private final Drive drive;
+  private final AprilTagVision aprilTagVision;
+  private final ObjectDetectionVision objectDetectionVision;
 
   // Controller
   private final CommandXboxController controller = new CommandXboxController(0);
@@ -52,35 +63,59 @@ public class RobotContainer {
     switch (Constants.currentMode) {
       case REAL:
         // Real robot, instantiate hardware IO implementations
+        aprilTagVision =
+            new AprilTagVision(
+                new AprilTagIOPhotonVision(
+                    VisionConstants.AprilTagCameraName, VisionConstants.AprilTagCameraTransform));
+        objectDetectionVision =
+            new ObjectDetectionVision(
+                new ObjectDetectionIOPhotonVision(
+                    VisionConstants.ObjectDetectionCameraName,
+                    VisionConstants.ObjectDetectionCameraTransform));
         drive =
             new Drive(
                 new GyroIONavX(),
                 new ModuleIOSpark(0),
                 new ModuleIOSpark(1),
                 new ModuleIOSpark(2),
-                new ModuleIOSpark(3));
+                new ModuleIOSpark(3),
+                aprilTagVision);
         break;
 
       case SIM:
         // Sim robot, instantiate physics sim IO implementations
+        aprilTagVision =
+            new AprilTagVision(
+                new AprilTagIOSim(
+                    VisionConstants.AprilTagCameraName, VisionConstants.AprilTagCameraTransform));
+        objectDetectionVision =
+            new ObjectDetectionVision(
+                new ObjectDetectionIOSim(
+                    VisionConstants.ObjectDetectionCameraName,
+                    VisionConstants.ObjectDetectionCameraTransform));
         drive =
             new Drive(
                 new GyroIO() {},
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim(),
-                new ModuleIOSim());
+                new ModuleIOSim(),
+                aprilTagVision);
+
         break;
 
       default:
         // Replayed robot, disable IO implementations
+        aprilTagVision = new AprilTagVision(new AprilTagIO() {});
+        objectDetectionVision = new ObjectDetectionVision(new ObjectDetectionIO() {});
         drive =
             new Drive(
                 new GyroIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
-                new ModuleIO() {});
+                new ModuleIO() {},
+                aprilTagVision);
         break;
     }
 
@@ -121,19 +156,6 @@ public class RobotContainer {
             () -> -controller.getLeftY(),
             () -> -controller.getLeftX(),
             () -> -controller.getRightX()));
-
-    // Lock to 0° when A button is held
-    controller
-        .a()
-        .whileTrue(
-            DriveCommands.joystickDriveAtAngle(
-                drive,
-                () -> -controller.getLeftY(),
-                () -> -controller.getLeftX(),
-                () -> new Rotation2d()));
-
-    // Switch to X pattern when X button is pressed
-    controller.x().onTrue(Commands.runOnce(drive::stopWithX, drive));
 
     // Reset gyro to 0° when B button is pressed
     controller
