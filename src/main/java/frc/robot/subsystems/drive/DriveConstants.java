@@ -15,10 +15,14 @@ package frc.robot.subsystems.drive;
 
 import com.pathplanner.lib.config.ModuleConfig;
 import com.pathplanner.lib.config.RobotConfig;
+import com.pathplanner.lib.path.PathConstraints;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
+import java.util.Arrays;
+import java.util.List;
 
 public class DriveConstants {
   public static final double maxSpeedMetersPerSec = 4.2;
@@ -110,4 +114,28 @@ public class DriveConstants {
               driveMotorCurrentLimit,
               1),
           moduleTranslations);
+
+  public static final PathConstraints pathConstraints =
+      new PathConstraints(
+          maxSpeedMetersPerSec / 2, maxSpeedMetersPerSec / 2, 2 * Math.PI, 4 * Math.PI);
+
+  // Drive Commands Constatns
+  public static final double DEADBAND = 0.1;
+  public static final double ANGLE_KP = 5.0;
+  public static final double ANGLE_KD = 0.4;
+  public static final double ANGLE_MAX_VELOCITY = 8.0;
+  public static final double ANGLE_MAX_ACCELERATION = 20.0;
+  public static final double FF_START_DELAY = 2.0; // Secs
+  public static final double FF_RAMP_RATE = 0.1; // Volts/Sec
+  public static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
+  public static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
+
+  public static final List<Pose2d> sidesOfTheReef =
+      Arrays.asList(
+          new Pose2d(3.82, 5.122, new Rotation2d(Units.degreesToRadians(-60))),
+          new Pose2d(3.223, 4.035, new Rotation2d(Units.degreesToRadians(0))),
+          new Pose2d(3.839, 2.919, new Rotation2d(Units.degreesToRadians(60))),
+          new Pose2d(5.09, 2.909, new Rotation2d(Units.degreesToRadians(120))),
+          new Pose2d(5.75, 4.025, new Rotation2d(Units.degreesToRadians(180))),
+          new Pose2d(5.148, 5.131, new Rotation2d(Units.degreesToRadians(-120))));
 }

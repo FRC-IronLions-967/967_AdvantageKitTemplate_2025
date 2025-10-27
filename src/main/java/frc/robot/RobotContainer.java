@@ -167,6 +167,17 @@ public class RobotContainer {
                             new Pose2d(drive.getPose().getTranslation(), new Rotation2d())),
                     drive)
                 .ignoringDisable(true));
+
+    controller
+        .leftTrigger()
+        .onTrue(
+            DriveCommands.joystickDriveFacingTarget(
+                drive,
+                () -> 0.5,
+                () -> 0.0,
+                () ->
+                    objectDetectionVision.getObjectX(VisionConstants.ObjectDetectionCameraIndex)));
+    controller.rightTrigger().onTrue(DriveCommands.goToPoseWithPP(drive, drive.getPose()));
   }
 
   /**

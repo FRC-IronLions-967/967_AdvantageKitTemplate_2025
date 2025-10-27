@@ -13,6 +13,7 @@
 
 package frc.robot.commands;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -36,21 +37,12 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class DriveCommands {
-  private static final double DEADBAND = 0.1;
-  private static final double ANGLE_KP = 5.0;
-  private static final double ANGLE_KD = 0.4;
-  private static final double ANGLE_MAX_VELOCITY = 8.0;
-  private static final double ANGLE_MAX_ACCELERATION = 20.0;
-  private static final double FF_START_DELAY = 2.0; // Secs
-  private static final double FF_RAMP_RATE = 0.1; // Volts/Sec
-  private static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
-  private static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
 
   private DriveCommands() {}
 
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
     // Apply deadband
-    double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DEADBAND);
+    double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DriveConstants.DEADBAND);
     Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
 
     // Square magnitude for more precise control
@@ -77,7 +69,8 @@ public class DriveCommands {
               getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
           // Apply rotation deadband
-          double omega = MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DEADBAND);
+          double omega =
+              MathUtil.applyDeadband(omegaSupplier.getAsDouble(), DriveConstants.DEADBAND);
 
           // Square rotation value for more precise control
           omega = Math.copySign(omega * omega, omega);
@@ -97,8 +90,15 @@ public class DriveCommands {
    * Field relative drive command using joystick for linear control and PID for angular control.
    * Possible use cases include snapping to an angle, aiming at a vision target, or controlling
    * absolute rotation with a joystick.
+   *
+   * @param drive
+   * @param xSupplier speed -1 to 1 forward/backward
+   * @param ySupplier speed -1 to 1 left/right
+   * @param rotationSupplier angle from front to the target EG. camera to object or camera to tag
+   *     yaw
+   * @return The command to be used
    */
-  public static Command joystickDriveAtAngle(
+  public static Command joystickDriveFacingTarget(
       Drive drive,
       DoubleSupplier xSupplier,
       DoubleSupplier ySupplier,
@@ -107,10 +107,11 @@ public class DriveCommands {
     // Create PID controller
     ProfiledPIDController angleController =
         new ProfiledPIDController(
-            ANGLE_KP,
+            DriveConstants.ANGLE_KP,
             0.0,
-            ANGLE_KD,
-            new TrapezoidProfile.Constraints(ANGLE_MAX_VELOCITY, ANGLE_MAX_ACCELERATION));
+            DriveConstants.ANGLE_KD,
+            new TrapezoidProfile.Constraints(
+                DriveConstants.ANGLE_MAX_VELOCITY, DriveConstants.ANGLE_MAX_ACCELERATION));
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 
     // Construct command
@@ -121,9 +122,7 @@ public class DriveCommands {
                   getLinearVelocityFromJoysticks(xSupplier.getAsDouble(), ySupplier.getAsDouble());
 
               // Calculate angular speed
-              double omega =
-                  angleController.calculate(
-                      drive.getRotation().getRadians(), rotationSupplier.get().getRadians());
+              double omega = angleController.calculate(rotationSupplier.get().getRadians(), 0);
 
               // Convert to field relative speeds & send command
               ChassisSpeeds speeds =
@@ -137,6 +136,18 @@ public class DriveCommands {
 
         // Reset PID controller when command starts
         .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+  }
+
+  /**
+   * Used to go to a specific pose with the added complexity of pp
+   *
+   * @param drive drive subsystem
+   * @param currentPose reading from odometry even with vision bc vision updates odometry
+   * @return path that drive will follow
+   */
+  public static Command goToPoseWithPP(Drive drive, Pose2d currentPose) {
+    return AutoBuilder.pathfindToPose(
+        currentPose.nearest(DriveConstants.sidesOfTheReef), DriveConstants.pathConstraints);
   }
 
   /**
@@ -163,7 +174,7 @@ public class DriveCommands {
                   drive.runCharacterization(0.0);
                 },
                 drive)
-            .withTimeout(FF_START_DELAY),
+            .withTimeout(DriveConstants.FF_START_DELAY),
 
         // Start timer
         Commands.runOnce(timer::restart),
@@ -171,7 +182,7 @@ public class DriveCommands {
         // Accelerate and gather data
         Commands.run(
                 () -> {
-                  double voltage = timer.get() * FF_RAMP_RATE;
+                  double voltage = timer.get() * DriveConstants.FF_RAMP_RATE;
                   drive.runCharacterization(voltage);
                   velocitySamples.add(drive.getFFCharacterizationVelocity());
                   voltageSamples.add(voltage);
@@ -204,7 +215,7 @@ public class DriveCommands {
 
   /** Measures the robot's wheel radius by spinning in a circle. */
   public static Command wheelRadiusCharacterization(Drive drive) {
-    SlewRateLimiter limiter = new SlewRateLimiter(WHEEL_RADIUS_RAMP_RATE);
+    SlewRateLimiter limiter = new SlewRateLimiter(DriveConstants.WHEEL_RADIUS_RAMP_RATE);
     WheelRadiusCharacterizationState state = new WheelRadiusCharacterizationState();
 
     return Commands.parallel(
@@ -219,7 +230,7 @@ public class DriveCommands {
             // Turn in place, accelerating up to full speed
             Commands.run(
                 () -> {
-                  double speed = limiter.calculate(WHEEL_RADIUS_MAX_VELOCITY);
+                  double speed = limiter.calculate(DriveConstants.WHEEL_RADIUS_MAX_VELOCITY);
                   drive.runVelocity(new ChassisSpeeds(0.0, 0.0, speed));
                 },
                 drive)),
