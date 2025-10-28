@@ -177,7 +177,15 @@ public class RobotContainer {
                 () -> 0.0,
                 () ->
                     objectDetectionVision.getObjectX(VisionConstants.ObjectDetectionCameraIndex)));
-    controller.rightTrigger().onTrue(DriveCommands.goToPoseWithPP(drive, drive.getPose()));
+    controller.rightTrigger().onTrue(DriveCommands.goToPoseWithPP(drive));
+    controller
+        .rightTrigger()
+        .onFalse(
+            DriveCommands.joystickDrive(
+                drive,
+                () -> -controller.getLeftY(),
+                () -> -controller.getLeftX(),
+                () -> -controller.getRightX())); // used to be able to control the robot
   }
 
   /**

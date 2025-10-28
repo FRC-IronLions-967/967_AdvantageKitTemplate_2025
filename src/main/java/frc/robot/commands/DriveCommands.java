@@ -27,6 +27,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.drive.Drive;
 import frc.robot.subsystems.drive.DriveConstants;
 import java.text.DecimalFormat;
@@ -141,13 +142,18 @@ public class DriveCommands {
   /**
    * Used to go to a specific pose with the added complexity of pp
    *
-   * @param drive drive subsystem
-   * @param currentPose reading from odometry even with vision bc vision updates odometry
+   * @param drive drive subsystem we get the current pose off this
    * @return path that drive will follow
    */
-  public static Command goToPoseWithPP(Drive drive, Pose2d currentPose) {
-    return AutoBuilder.pathfindToPose(
-        currentPose.nearest(DriveConstants.sidesOfTheReef), DriveConstants.pathConstraints);
+  public static Command goToPoseWithPP(Drive drive) {
+    return new InstantCommand(
+        () -> {
+          AutoBuilder.pathfindToPose(
+                  drive.getPose().nearest(DriveConstants.sidesOfTheReef),
+                  DriveConstants.pathConstraints)
+              .schedule();
+        },
+        drive);
   }
 
   /**
