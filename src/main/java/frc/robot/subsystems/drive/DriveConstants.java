@@ -23,6 +23,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 import java.util.Arrays;
 import java.util.List;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class DriveConstants {
   public static final double maxSpeedMetersPerSec = 4.2;
@@ -45,8 +46,6 @@ public class DriveConstants {
   public static final Rotation2d backRightZeroRotation = new Rotation2d(-0.0354);
 
   // Device CAN IDs
-  public static final int pigeonCanId = 9;
-
   public static final int frontLeftDriveCanId = 1;
   public static final int backLeftDriveCanId = 3;
   public static final int frontRightDriveCanId = 7;
@@ -70,14 +69,22 @@ public class DriveConstants {
       (2 * Math.PI) / 60.0 / driveMotorReduction; // Rotor RPM -> Wheel Rad/Sec
 
   // Drive PID configuration
-  public static final double driveKp = 0.01;
-  public static final double driveKd = 0.005;
-  public static final double driveKs = 0.13854;
-  public static final double driveKv = 0.12326;
-  public static final double driveSimP = 0.05;
-  public static final double driveSimD = 0.0;
-  public static final double driveSimKs = 0.0;
-  public static final double driveSimKv = 0.0789;
+  public static final LoggedNetworkNumber driveKp =
+      new LoggedNetworkNumber("Tuning/Drive/Drive/PID/Kp", 0.01);
+  public static final LoggedNetworkNumber driveKd =
+      new LoggedNetworkNumber("Tuning/Drive/Drive/PID/Kd", 0.005);
+  public static final LoggedNetworkNumber driveKs =
+      new LoggedNetworkNumber("Tuning/Drive/Drive/PID/Ks", 0.13854);
+  public static final LoggedNetworkNumber driveKv =
+      new LoggedNetworkNumber("Tuning/Drive/Drive/PID/Kv", 0.12326);
+  public static final LoggedNetworkNumber driveSimP =
+      new LoggedNetworkNumber("Tuning/Drive/Drive/PID/SimP", 0.12326);
+  public static final LoggedNetworkNumber driveSimD =
+      new LoggedNetworkNumber("Tuning/Drive/Drive/PID/SimD", 0.0);
+  public static final LoggedNetworkNumber driveSimKs =
+      new LoggedNetworkNumber("Tuning/Drive/Drive/PID/SimKs", 0.0);
+  public static final LoggedNetworkNumber driveSimKv =
+      new LoggedNetworkNumber("Tuning/Drive/Drive/PID/SimKv", 0.0789);
 
   // Turn motor configuration
   public static final boolean turnInverted = true;
@@ -91,11 +98,15 @@ public class DriveConstants {
   public static final double turnEncoderVelocityFactor = (2 * Math.PI) / 60.0; // RPM -> Rad/Sec
 
   // Turn PID configuration
-  public static final double turnKp = 1.0;
-  public static final double turnKd = 0.0;
-  public static final double turnSimP = 8.0;
-  public static final double turnSimD = 0.0;
-  public static final double turnPIDMinInput = 0; // Radians
+  public static final LoggedNetworkNumber turnKp =
+      new LoggedNetworkNumber("Tuning/Drive/Turning/PID/Kp", 1.0);
+  public static final LoggedNetworkNumber turnKd =
+      new LoggedNetworkNumber("Tuning/Drive/Turning/PID/Kd", 0.0);
+  public static final LoggedNetworkNumber turnSimP =
+      new LoggedNetworkNumber("Tuning/Drive/Turning/PID/SimP", 8.0);
+  public static final LoggedNetworkNumber turnSimD =
+      new LoggedNetworkNumber("Tuning/Drive/Turning/PID/SimD", 0.0);
+  public static final double turnPIDMinInput = 0.0; // Radians
   public static final double turnPIDMaxInput = 2 * Math.PI; // Radians
 
   // PathPlanner configuration
