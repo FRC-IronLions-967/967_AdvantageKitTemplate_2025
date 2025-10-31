@@ -14,6 +14,8 @@
 package frc.robot;
 
 import com.pathplanner.lib.pathfinding.Pathfinding;
+import edu.wpi.first.net.WebServer;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.util.LocalADStarAK;
@@ -88,6 +90,9 @@ public class Robot extends LoggedRobot {
 
     // enable pathfinding
     Pathfinding.setPathfinder(new LocalADStarAK());
+
+    // Elastic Config
+    WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
   }
 
   /** This function is called periodically during all modes. */
