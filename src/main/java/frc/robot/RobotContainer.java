@@ -35,7 +35,6 @@ import frc.robot.subsystems.vision.AprilTagIOSim;
 import frc.robot.subsystems.vision.AprilTagVision;
 import frc.robot.subsystems.vision.ObjectDetectionIO;
 import frc.robot.subsystems.vision.ObjectDetectionIOPhotonVision;
-import frc.robot.subsystems.vision.ObjectDetectionIOSim;
 import frc.robot.subsystems.vision.ObjectDetectionVision;
 import frc.robot.subsystems.vision.VisionConstants;
 import org.littletonrobotics.junction.networktables.LoggedDashboardChooser;
@@ -90,9 +89,7 @@ public class RobotContainer {
                     VisionConstants.AprilTagCameraName, VisionConstants.AprilTagCameraTransform));
         objectDetectionVision =
             new ObjectDetectionVision(
-                new ObjectDetectionIOSim(
-                    VisionConstants.ObjectDetectionCameraName,
-                    VisionConstants.ObjectDetectionCameraTransform));
+                new ObjectDetectionIO() {}); // No object detection sim because complex💀
         drive =
             new Drive(
                 new GyroIO() {},
@@ -101,7 +98,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 aprilTagVision);
-
+        aprilTagVision.setPoseSupplierIfSim(drive::getPose);
         break;
 
       default:

@@ -6,10 +6,12 @@ package frc.robot.subsystems.vision;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.subsystems.vision.AprilTagIO.PoseObservation;
 import frc.robot.subsystems.vision.AprilTagIO.TargetInfo;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.Logger;
 
 public class AprilTagVision extends SubsystemBase {
@@ -51,12 +53,25 @@ public class AprilTagVision extends SubsystemBase {
   }
 
   /**
-   * !!!Use with isVisionPoseGood() !!!
+   * Use with {@code AprilTagVision.isVisionPoseGood()}
    *
    * @return the pose calculated between all cameras
    */
   public Pose2d getVisionPose() {
     return acceptedPose;
+  }
+
+  /**
+   * Only to be used with sim to fix looping inits
+   *
+   * @param poseSupplier posesupplier for sim
+   */
+  public void setPoseSupplierIfSim(Supplier<Pose2d> poseSupplier) {
+    if (Constants.currentMode == Constants.Mode.SIM) {
+      for (int i = 0; i < io.length; i++) {
+        io[i].givePoseSupplier(poseSupplier);
+      }
+    }
   }
 
   @Override
@@ -105,7 +120,8 @@ public class AprilTagVision extends SubsystemBase {
         int x = 0;
         int y = 0;
         for (int i = 0; i < robotObservatonsAccepted.size(); i++) {
-          double ambiguityFactor = 1 - (robotObservatonsAccepted.get(i).ambiguity() / totalambiguity);
+          double ambiguityFactor =
+              1 - (robotObservatonsAccepted.get(i).ambiguity() / totalambiguity);
           x += robotObservatonsAccepted.get(i).pose().getX() * ambiguityFactor;
           y += robotObservatonsAccepted.get(i).pose().getY() * ambiguityFactor;
         }

@@ -4,8 +4,10 @@
 
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation3d;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLog;
 
 /** Add your docs here. */
@@ -23,4 +25,6 @@ public interface AprilTagIO {
   public static record PoseObservation(double ambiguity, Pose3d pose, boolean hasTags) {}
 
   public default void updateInputs(AprilTagIOInputs inputs) {}
+
+  public default void givePoseSupplier(Supplier<Pose2d> poseSupplier) {} // Only use for sim
 }

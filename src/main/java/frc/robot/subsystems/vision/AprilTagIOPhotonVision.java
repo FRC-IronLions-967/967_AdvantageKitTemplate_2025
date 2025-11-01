@@ -21,6 +21,7 @@ public class AprilTagIOPhotonVision implements AprilTagIO {
 
   public AprilTagIOPhotonVision(String cameraName, Transform3d robotToCamera) {
     camera = new PhotonCamera(cameraName);
+    this.robotToCamera = robotToCamera;
     poseEstimator =
         new PhotonPoseEstimator(
             VisionConstants.kTagLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCamera);

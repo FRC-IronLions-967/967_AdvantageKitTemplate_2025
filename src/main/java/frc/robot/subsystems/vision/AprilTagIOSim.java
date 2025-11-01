@@ -4,13 +4,49 @@
 
 package frc.robot.subsystems.vision;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Transform3d;
+import java.util.function.Supplier;
+import org.photonvision.simulation.PhotonCameraSim;
+import org.photonvision.simulation.SimCameraProperties;
+import org.photonvision.simulation.VisionSystemSim;
 
 /** Add your docs here. */
 public class AprilTagIOSim extends AprilTagIOPhotonVision {
+  private static VisionSystemSim visionSim;
+
+  private Supplier<Pose2d> poseSupplier;
+  private final PhotonCameraSim cameraSim;
 
   public AprilTagIOSim(String cameraName, Transform3d robotToCamera) {
     super(cameraName, robotToCamera);
-    // TODO Auto-generated constructor stub
+
+    // Initialize vision sim
+    if (visionSim == null) {
+      visionSim = new VisionSystemSim("main");
+      visionSim.addAprilTags(VisionConstants.kTagLayout);
+    }
+
+    // Add sim camera
+    var cameraProperties = new SimCameraProperties();
+    cameraSim = new PhotonCameraSim(camera, cameraProperties, VisionConstants.kTagLayout);
+    visionSim.addCamera(cameraSim, robotToCamera);
+  }
+
+  @Override
+  public void updateInputs(AprilTagIOInputs inputs) {
+    if (poseSupplier != null) {
+      visionSim.update(poseSupplier.get());
+    }
+    super.updateInputs(inputs);
+  }
+
+  /**
+   * needed because looping parameters USE ONCE AFTER BOTH DRIVE AND APRILTAGVISION ARE INITIALIZED
+   *
+   * @param poseSupplier updates the poseSupplier
+   */
+  public void givePoseSupplier(Supplier<Pose2d> poseSupplier) {
+    this.poseSupplier = poseSupplier;
   }
 }

@@ -4,13 +4,12 @@
 
 package frc.robot.subsystems.vision;
 
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 /** Add your docs here. */
 public class VisionConstants {
@@ -30,6 +29,8 @@ public class VisionConstants {
       AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
 
   // Tuning constants
-  public static final LoggedNetworkNumber maxAmbiguity = new LoggedNetworkNumber("Tuning/Vision/maxAmb", 0.3);
-  public static final LoggedNetworkNumber maxZError = new LoggedNetworkNumber("Tuning/Vision/maxZError", 0.75);
+  public static final LoggedNetworkNumber maxAmbiguity =
+      new LoggedNetworkNumber("Tuning/Vision/maxAmb", 0.3);
+  public static final LoggedNetworkNumber maxZError =
+      new LoggedNetworkNumber("Tuning/Vision/maxZError", 0.75);
 }

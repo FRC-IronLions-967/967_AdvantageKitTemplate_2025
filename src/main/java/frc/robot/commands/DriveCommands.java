@@ -43,7 +43,8 @@ public class DriveCommands {
 
   private static Translation2d getLinearVelocityFromJoysticks(double x, double y) {
     // Apply deadband
-    double linearMagnitude = MathUtil.applyDeadband(Math.hypot(x, y), DriveConstants.DEADBAND.get());
+    double linearMagnitude =
+        MathUtil.applyDeadband(Math.hypot(x, y), DriveConstants.DEADBAND.get());
     Rotation2d linearDirection = new Rotation2d(Math.atan2(y, x));
 
     // Square magnitude for more precise control
@@ -112,7 +113,8 @@ public class DriveCommands {
             0.0,
             DriveConstants.ANGLE_KD.get(),
             new TrapezoidProfile.Constraints(
-                DriveConstants.ANGLE_MAX_VELOCITY.get(), DriveConstants.ANGLE_MAX_ACCELERATION.get()));
+                DriveConstants.ANGLE_MAX_VELOCITY.get(),
+                DriveConstants.ANGLE_MAX_ACCELERATION.get()));
     angleController.enableContinuousInput(-Math.PI, Math.PI);
 
     // Construct command
