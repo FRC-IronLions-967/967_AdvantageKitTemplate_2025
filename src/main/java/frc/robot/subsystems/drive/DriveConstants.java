@@ -131,15 +131,15 @@ public class DriveConstants {
           maxSpeedMetersPerSec / 2, maxSpeedMetersPerSec / 2, 2 * Math.PI, 4 * Math.PI);
 
   // Drive Commands Constatns
-  public static final double DEADBAND = 0.1;
-  public static final double ANGLE_KP = 5.0;
-  public static final double ANGLE_KD = 0.4;
-  public static final double ANGLE_MAX_VELOCITY = 8.0;
-  public static final double ANGLE_MAX_ACCELERATION = 20.0;
-  public static final double FF_START_DELAY = 2.0; // Secs
-  public static final double FF_RAMP_RATE = 0.1; // Volts/Sec
-  public static final double WHEEL_RADIUS_MAX_VELOCITY = 0.25; // Rad/Sec
-  public static final double WHEEL_RADIUS_RAMP_RATE = 0.05; // Rad/Sec^2
+  public static final LoggedNetworkNumber DEADBAND = new LoggedNetworkNumber("Tuning/Drive/AutoPID/Deadband", 0.1);
+  public static final LoggedNetworkNumber ANGLE_KP = new LoggedNetworkNumber("Tuning/Drive/AutoPID/AnglekP", 5.0);
+  public static final LoggedNetworkNumber ANGLE_KD = new LoggedNetworkNumber("Tuning/Drive/AutoPID/AnglekD", 0.4);
+  public static final LoggedNetworkNumber ANGLE_MAX_VELOCITY = new LoggedNetworkNumber("Tuning/Drive/AutoPID/AngleMaxVelocity", 8.0);
+  public static final LoggedNetworkNumber ANGLE_MAX_ACCELERATION = new LoggedNetworkNumber("Tuning/Drive/AutoPID/AngleMaxAcel", 20.0);
+  public static final LoggedNetworkNumber FF_START_DELAY = new LoggedNetworkNumber("Tuning/Drive/AutoPID/FFStartDelay", 2.0); // Secs
+  public static final LoggedNetworkNumber FF_RAMP_RATE = new LoggedNetworkNumber("Tuning/Drive/AutoPID/FFRampRate", 0.1); // Volts/Sec
+  public static final LoggedNetworkNumber WHEEL_RADIUS_MAX_VELOCITY = new LoggedNetworkNumber("Tuning/Drive/AutoPID/WheelRadiusMaxVelocity", 0.25); // Rad/Sec
+  public static final LoggedNetworkNumber WHEEL_RADIUS_RAMP_RATE = new LoggedNetworkNumber("Tuning/Drive/AutoPID/WheelRadiusRampRate", 0.05); // Rad/Sec^2
 
   public static final List<Pose2d> sidesOfTheReef =
       Arrays.asList(

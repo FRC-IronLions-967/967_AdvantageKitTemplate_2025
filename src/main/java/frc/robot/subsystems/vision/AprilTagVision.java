@@ -75,8 +75,8 @@ public class AprilTagVision extends SubsystemBase {
       for (var obs : inputs[cameraIndex].poseObservations) {
         // filtering
         boolean rejectPose =
-            obs.ambiguity() > VisionConstants.maxAmbiguity
-                || obs.pose().getZ() > VisionConstants.maxZError
+            obs.ambiguity() > VisionConstants.maxAmbiguity.get()
+                || obs.pose().getZ() > VisionConstants.maxZError.get()
                 || !obs.hasTags()
                 || obs.pose().getX() < 0
                 || obs.pose().getY() < 0
@@ -105,7 +105,7 @@ public class AprilTagVision extends SubsystemBase {
         int x = 0;
         int y = 0;
         for (int i = 0; i < robotObservatonsAccepted.size(); i++) {
-          double ambiguityFactor = robotObservatonsAccepted.get(i).ambiguity() / totalambiguity;
+          double ambiguityFactor = 1 - (robotObservatonsAccepted.get(i).ambiguity() / totalambiguity);
           x += robotObservatonsAccepted.get(i).pose().getX() * ambiguityFactor;
           y += robotObservatonsAccepted.get(i).pose().getY() * ambiguityFactor;
         }
