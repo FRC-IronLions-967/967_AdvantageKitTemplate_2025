@@ -32,6 +32,7 @@ public class AprilTagVision extends SubsystemBase {
   private double xSum;
   private double ySum;
   private double totalTimeStamps;
+  private double ambiguityFactor;
 
   /** Creates a new AprilTagVision. */
   public AprilTagVision(AprilTagIO... io) {
@@ -76,7 +77,6 @@ public class AprilTagVision extends SubsystemBase {
 
   @Override
   public void periodic() {
-
     // set values to reset
     robotObservatons.clear();
     robotObservatonsRejected.clear();
@@ -123,8 +123,7 @@ public class AprilTagVision extends SubsystemBase {
         acceptedPoseGood = true;
       } else {
         for (int i = 0; i < robotObservatonsAccepted.size(); i++) {
-          double ambiguityFactor =
-              1 - (robotObservatonsAccepted.get(i).ambiguity() / totalambiguity);
+          ambiguityFactor = 1 - (robotObservatonsAccepted.get(i).ambiguity() / totalambiguity);
           xSum += robotObservatonsAccepted.get(i).pose().getX() * ambiguityFactor;
           ySum += robotObservatonsAccepted.get(i).pose().getY() * ambiguityFactor;
           totalTimeStamps += robotObservatonsAccepted.get(i).timestamp();
