@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.vision.AprilTagIO.PoseObservation;
 import frc.robot.subsystems.vision.AprilTagIO.TargetInfo;
+import frc.robot.subsystems.vision.AprilTagIO.VisionPoseObs;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -20,6 +21,17 @@ public class AprilTagVision extends SubsystemBase {
   private final AprilTagIOInputsAutoLogged[] inputs;
   private Pose2d acceptedPose;
   private boolean acceptedPoseGood;
+  private double timestamp;
+
+  // Periodic variables HERE TO NOT RUN OUT OF MEM
+  private List<PoseObservation> robotObservatons = new LinkedList<>();
+  private List<PoseObservation> robotObservatonsAccepted = new LinkedList<>();
+  private List<PoseObservation> robotObservatonsRejected = new LinkedList<>();
+  private double totalambiguity;
+  private boolean rejectPose;
+  private double xSum;
+  private double ySum;
+  private double totalTimeStamps;
 
   /** Creates a new AprilTagVision. */
   public AprilTagVision(AprilTagIO... io) {
@@ -45,20 +57,8 @@ public class AprilTagVision extends SubsystemBase {
     return null;
   }
 
-  /**
-   * @return if the vision pose is good
-   */
-  public boolean isVisionPoseGood() {
-    return acceptedPoseGood;
-  }
-
-  /**
-   * Use with {@code AprilTagVision.isVisionPoseGood()}
-   *
-   * @return the pose calculated between all cameras
-   */
-  public Pose2d getVisionPose() {
-    return acceptedPose;
+  public VisionPoseObs getPoseObs() {
+    return new VisionPoseObs(acceptedPose, acceptedPoseGood, timestamp);
   }
 
   /**
@@ -76,20 +76,25 @@ public class AprilTagVision extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    // set values to reset
+    robotObservatons.clear();
+    robotObservatonsRejected.clear();
+    robotObservatonsAccepted.clear();
+    totalambiguity = 0.;
+    xSum = 0.0;
+    ySum = 0.0;
+
     // Update Inputs
     for (int i = 0; i < inputs.length; i++) {
       io[i].updateInputs(inputs[i]);
       Logger.processInputs("Vision/AprilTag/Camera" + Integer.toString(i), inputs[i]);
     }
-    List<PoseObservation> robotObservatons = new LinkedList<>();
-    List<PoseObservation> robotObservatonsAccepted = new LinkedList<>();
-    List<PoseObservation> robotObservatonsRejected = new LinkedList<>();
-    double totalambiguity = 0;
     // Update Pose
     for (int cameraIndex = 0; cameraIndex < inputs.length; cameraIndex++) {
       for (var obs : inputs[cameraIndex].poseObservations) {
         // filtering
-        boolean rejectPose =
+        rejectPose =
             obs.ambiguity() > VisionConstants.maxAmbiguity.get()
                 || obs.pose().getZ() > VisionConstants.maxZError.get()
                 || !obs.hasTags()
@@ -117,16 +122,16 @@ public class AprilTagVision extends SubsystemBase {
         acceptedPose = robotObservatonsAccepted.get(0).pose().toPose2d();
         acceptedPoseGood = true;
       } else {
-        int x = 0;
-        int y = 0;
         for (int i = 0; i < robotObservatonsAccepted.size(); i++) {
           double ambiguityFactor =
               1 - (robotObservatonsAccepted.get(i).ambiguity() / totalambiguity);
-          x += robotObservatonsAccepted.get(i).pose().getX() * ambiguityFactor;
-          y += robotObservatonsAccepted.get(i).pose().getY() * ambiguityFactor;
+          xSum += robotObservatonsAccepted.get(i).pose().getX() * ambiguityFactor;
+          ySum += robotObservatonsAccepted.get(i).pose().getY() * ambiguityFactor;
+          totalTimeStamps += robotObservatonsAccepted.get(i).timestamp();
         }
-        acceptedPose = new Pose2d(x, y, null);
+        acceptedPose = new Pose2d(xSum, ySum, null);
         acceptedPoseGood = true;
+        timestamp = totalTimeStamps / robotObservatonsAccepted.size();
       }
     } else {
       acceptedPoseGood = false;

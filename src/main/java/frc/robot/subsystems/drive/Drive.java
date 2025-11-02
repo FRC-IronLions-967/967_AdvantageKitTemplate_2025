@@ -44,10 +44,11 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.Constants;
 import frc.robot.Constants.Mode;
-import frc.robot.subsystems.vision.AprilTagVision;
+import frc.robot.subsystems.vision.AprilTagIO.VisionPoseObs;
 import frc.robot.util.LocalADStarAK;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.function.Supplier;
 import org.littletonrobotics.junction.AutoLogOutput;
 import org.littletonrobotics.junction.Logger;
 
@@ -61,7 +62,7 @@ public class Drive extends SubsystemBase {
       new Alert("Disconnected gyro, using kinematics as fallback.", AlertType.kError);
 
   private final boolean visionPresent;
-  private final AprilTagVision vision;
+  private final Supplier<VisionPoseObs> visionObs;
 
   private SwerveDriveKinematics kinematics = new SwerveDriveKinematics(moduleTranslations);
   private Rotation2d rawGyroRotation = new Rotation2d();
@@ -81,7 +82,7 @@ public class Drive extends SubsystemBase {
       ModuleIO frModuleIO,
       ModuleIO blModuleIO,
       ModuleIO brModuleIO,
-      AprilTagVision vision) {
+      Supplier<VisionPoseObs> visionObs) {
     this.gyroIO = gyroIO;
     modules[0] = new Module(flModuleIO, 0);
     modules[1] = new Module(frModuleIO, 1);
@@ -128,8 +129,8 @@ public class Drive extends SubsystemBase {
                 (voltage) -> runCharacterization(voltage.in(Volts)), null, this));
 
     // Vision
-    this.vision = vision;
-    visionPresent = vision != null;
+    this.visionObs = visionObs;
+    visionPresent = visionObs != null;
   }
 
   public Drive(
@@ -200,12 +201,13 @@ public class Drive extends SubsystemBase {
     gyroDisconnectedAlert.set(!gyroInputs.connected && Constants.currentMode != Mode.SIM);
 
     // update odemtry based on vision
-    if (visionPresent && vision.isVisionPoseGood()) {
-      poseEstimator.resetPose(
+    if (visionPresent && visionObs.get().poseObsGood()) {
+      poseEstimator.addVisionMeasurement(
           new Pose2d(
-              vision.getVisionPose().getX(),
-              vision.getVisionPose().getY(),
-              gyroInputs.yawPosition));
+              visionObs.get().poseObs().getX(),
+              visionObs.get().poseObs().getY(),
+              gyroInputs.yawPosition),
+          sampleCount);
     }
   }
 

@@ -78,7 +78,7 @@ public class RobotContainer {
                 new ModuleIOSpark(1),
                 new ModuleIOSpark(2),
                 new ModuleIOSpark(3),
-                aprilTagVision);
+                aprilTagVision::getPoseObs);
         break;
 
       case SIM:
@@ -97,7 +97,7 @@ public class RobotContainer {
                 new ModuleIOSim(),
                 new ModuleIOSim(),
                 new ModuleIOSim(),
-                aprilTagVision);
+                aprilTagVision::getPoseObs);
         aprilTagVision.setPoseSupplierIfSim(drive::getPose);
         break;
 
@@ -112,7 +112,7 @@ public class RobotContainer {
                 new ModuleIO() {},
                 new ModuleIO() {},
                 new ModuleIO() {},
-                aprilTagVision);
+                aprilTagVision::getPoseObs);
         break;
     }
 
