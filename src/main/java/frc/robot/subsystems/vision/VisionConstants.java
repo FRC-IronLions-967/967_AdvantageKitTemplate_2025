@@ -14,7 +14,7 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 /** Add your docs here. */
 public class VisionConstants {
   // April Tag Cmaera 1
-  public static final String AprilTagCameraName = "AprilTagCamera";
+  public static final String AprilTagCameraName = "April_Tag";
   public static final Transform3d AprilTagCameraTransform =
       new Transform3d(
           0, Units.inchesToMeters(14.376), Units.inchesToMeters(6.6), new Rotation3d(0, 0, 0));
