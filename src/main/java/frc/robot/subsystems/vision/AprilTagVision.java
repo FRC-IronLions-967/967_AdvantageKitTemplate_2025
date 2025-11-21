@@ -138,6 +138,8 @@ public class AprilTagVision extends SubsystemBase {
 
     Logger.recordOutput("Vision/AprilTag/AcceptedPose", acceptedPose);
     Logger.recordOutput("Vision/AprilTag/AcceptedPoseGood", acceptedPoseGood);
+    Logger.recordOutput("Vision/AprilTag/TotalVisionMesurmentsCount", robotObservatons.size());
+    Logger.recordOutput("Vision/AprilTag/RejectedPoseCount", robotObservatonsRejected.size());
     Logger.recordOutput(
         "Vision/AprilTag/AcceptedVisionMesurmentsCount", robotObservatonsAccepted.size());
   }
