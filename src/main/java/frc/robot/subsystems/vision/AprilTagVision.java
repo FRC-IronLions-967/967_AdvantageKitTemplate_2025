@@ -27,12 +27,7 @@ public class AprilTagVision extends SubsystemBase {
   private List<PoseObservation> robotObservatons = new LinkedList<>();
   private List<PoseObservation> robotObservatonsAccepted = new LinkedList<>();
   private List<PoseObservation> robotObservatonsRejected = new LinkedList<>();
-  private double totalambiguity;
   private boolean rejectPose;
-  private double xSum;
-  private double ySum;
-  private double totalTimeStamps;
-  private double ambiguityFactor;
 
   /** Creates a new AprilTagVision. */
   public AprilTagVision(AprilTagIO... io) {
@@ -42,6 +37,8 @@ public class AprilTagVision extends SubsystemBase {
     for (int i = 0; i < inputs.length; i++) {
       inputs[i] = new AprilTagIOInputsAutoLogged();
     }
+
+    acceptedPose = new Pose2d();
   }
 
   /**
@@ -81,9 +78,6 @@ public class AprilTagVision extends SubsystemBase {
     robotObservatons.clear();
     robotObservatonsRejected.clear();
     robotObservatonsAccepted.clear();
-    totalambiguity = 0.;
-    xSum = 0.0;
-    ySum = 0.0;
 
     // Update Inputs
     for (int i = 0; i < inputs.length; i++) {
@@ -103,7 +97,6 @@ public class AprilTagVision extends SubsystemBase {
                 || obs.pose().getX() > VisionConstants.kTagLayout.getFieldLength()
                 || obs.pose().getY() > VisionConstants.kTagLayout.getFieldWidth();
 
-        totalambiguity += obs.ambiguity();
         robotObservatons.add(obs);
         if (rejectPose) {
           robotObservatonsRejected.add(obs);
@@ -115,28 +108,15 @@ public class AprilTagVision extends SubsystemBase {
 
     /*Returns an accepted pose
      * if there is only one good pose then take that one.
-     * if there is more than one, find how ambigous one est is compared to another and average them with a the amb factor
      */
     if (robotObservatonsAccepted.size() >= 1) {
-      if (robotObservatonsAccepted.size() == 1) {
-        acceptedPose = robotObservatonsAccepted.get(0).pose().toPose2d();
-        acceptedPoseGood = true;
-      } else {
-        for (int i = 0; i < robotObservatonsAccepted.size(); i++) {
-          ambiguityFactor = 1 - (robotObservatonsAccepted.get(i).ambiguity() / totalambiguity);
-          xSum += robotObservatonsAccepted.get(i).pose().getX() * ambiguityFactor;
-          ySum += robotObservatonsAccepted.get(i).pose().getY() * ambiguityFactor;
-          totalTimeStamps += robotObservatonsAccepted.get(i).timestamp();
-        }
-        acceptedPose = new Pose2d(xSum, ySum, null);
-        acceptedPoseGood = true;
-        timestamp = totalTimeStamps / robotObservatonsAccepted.size();
-      }
+      acceptedPose = robotObservatonsAccepted.get(0).pose().toPose2d();
+      acceptedPoseGood = true;
+      timestamp = robotObservatonsAccepted.get(0).timestamp();
     } else {
       acceptedPoseGood = false;
     }
 
-    Logger.recordOutput("Vision/AprilTag/AcceptedPose", acceptedPose);
     Logger.recordOutput("Vision/AprilTag/AcceptedPoseGood", acceptedPoseGood);
     Logger.recordOutput("Vision/AprilTag/TotalVisionMesurmentsCount", robotObservatons.size());
     Logger.recordOutput("Vision/AprilTag/RejectedPoseCount", robotObservatonsRejected.size());

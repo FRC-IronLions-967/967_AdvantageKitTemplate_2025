@@ -11,6 +11,7 @@ import java.util.List;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+import org.photonvision.PhotonUtils;
 
 /** Add your docs here. */
 public class AprilTagIOPhotonVision implements AprilTagIO {
@@ -43,31 +44,33 @@ public class AprilTagIOPhotonVision implements AprilTagIO {
                 new TargetInfo(
                     target.fiducialId,
                     new Rotation3d(target.getYaw(), target.getPitch(), target.getSkew()),
-                    target
-                        .getBestCameraToTarget()
-                        .plus(robotToCamera)
-                        .getTranslation()
-                        .toTranslation2d()
-                        .getNorm()));
+                    target.getBestCameraToTarget().getTranslation().getNorm()));
+          }
+          // update pose
+          if (VisionConstants.kTagLayout
+              .getTagPose(result.getBestTarget().getFiducialId())
+              .isPresent()) {
+            poseObservations.add(
+                new PoseObservation(
+                    result.getBestTarget().getPoseAmbiguity(),
+                    PhotonUtils.estimateFieldToRobotAprilTag(
+                        result.getBestTarget().getBestCameraToTarget(),
+                        VisionConstants.kTagLayout
+                            .getTagPose(result.getBestTarget().getFiducialId())
+                            .get(),
+                        robotToCamera),
+                    inputs.hasTarget,
+                    result.getTimestampSeconds()));
           }
         }
         inputs.targetInfo = new TargetInfo[targetInfos.size()];
         for (int i = 0; i < targetInfos.size(); i++) {
           inputs.targetInfo[i] = targetInfos.get(i);
         }
-        // update pose
-        if (result.multitagResult.isPresent()) {
-          poseObservations.add(
-              new PoseObservation(
-                  result.multitagResult.get().estimatedPose.ambiguity,
-                  poseEstimator.update(result).get().estimatedPose,
-                  result.multitagResult.isPresent(),
-                  result.getTimestampSeconds()));
+        inputs.poseObservations = new PoseObservation[poseObservations.size()];
+        for (int i = 0; i < poseObservations.size(); i++) {
+          inputs.poseObservations[i] = poseObservations.get(i);
         }
-      }
-      inputs.poseObservations = new PoseObservation[poseObservations.size()];
-      for (int i = 0; i < poseObservations.size(); i++) {
-        inputs.poseObservations[i] = poseObservations.get(i);
       }
     } else {
       inputs.hasTarget = false;
