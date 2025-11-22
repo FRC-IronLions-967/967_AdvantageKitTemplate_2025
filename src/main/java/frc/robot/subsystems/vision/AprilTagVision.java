@@ -107,12 +107,17 @@ public class AprilTagVision extends SubsystemBase {
     }
 
     /*Returns an accepted pose
-     * if there is only one good pose then take that one.
+     * Uses the pose with the best ambiguity
      */
     if (robotObservatonsAccepted.size() >= 1) {
-      acceptedPose = robotObservatonsAccepted.get(0).pose().toPose2d();
+      int minAmb = 10000;
+      for (int i = 0; i < robotObservatonsAccepted.size(); i++) {
+        if (robotObservatonsAccepted.get(i).ambiguity() < minAmb) {
+          acceptedPose = robotObservatonsAccepted.get(i).pose().toPose2d();
+          timestamp = robotObservatonsAccepted.get(i).timestamp();
+        }
+      }
       acceptedPoseGood = true;
-      timestamp = robotObservatonsAccepted.get(0).timestamp();
     } else {
       acceptedPoseGood = false;
     }
