@@ -8,6 +8,7 @@ import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import java.util.LinkedList;
 import java.util.List;
+import org.littletonrobotics.junction.Logger;
 import org.photonvision.PhotonCamera;
 import org.photonvision.PhotonPoseEstimator;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
@@ -47,6 +48,7 @@ public class AprilTagIOPhotonVision implements AprilTagIO {
                     target.getBestCameraToTarget().getTranslation().getNorm()));
           }
           // update pose
+          Logger.recordOutput("BESTCAMERATOTARGET", result.getBestTarget().getBestCameraToTarget());
           if (VisionConstants.kTagLayout
               .getTagPose(result.getBestTarget().getFiducialId())
               .isPresent()) {
@@ -54,11 +56,11 @@ public class AprilTagIOPhotonVision implements AprilTagIO {
                 new PoseObservation(
                     result.getBestTarget().getPoseAmbiguity(),
                     PhotonUtils.estimateFieldToRobotAprilTag(
-                        result.getBestTarget().getBestCameraToTarget(),
+                        robotToCamera,
                         VisionConstants.kTagLayout
                             .getTagPose(result.getBestTarget().getFiducialId())
                             .get(),
-                        robotToCamera),
+                        result.getBestTarget().getBestCameraToTarget()),
                     inputs.hasTarget,
                     result.getTimestampSeconds()));
           }

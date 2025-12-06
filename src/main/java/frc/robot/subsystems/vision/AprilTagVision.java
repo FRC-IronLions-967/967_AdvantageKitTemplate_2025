@@ -110,11 +110,12 @@ public class AprilTagVision extends SubsystemBase {
      * Uses the pose with the best ambiguity
      */
     if (robotObservatonsAccepted.size() >= 1) {
-      int minAmb = 10000;
+      double minAmb = 10000;
       for (int i = 0; i < robotObservatonsAccepted.size(); i++) {
         if (robotObservatonsAccepted.get(i).ambiguity() < minAmb) {
           acceptedPose = robotObservatonsAccepted.get(i).pose().toPose2d();
           timestamp = robotObservatonsAccepted.get(i).timestamp();
+          minAmb = robotObservatonsAccepted.get(i).ambiguity();
         }
       }
       acceptedPoseGood = true;
@@ -123,6 +124,7 @@ public class AprilTagVision extends SubsystemBase {
     }
 
     Logger.recordOutput("Vision/AprilTag/AcceptedPoseGood", acceptedPoseGood);
+    Logger.recordOutput("Vision/AprilTag/AcceptedPose", acceptedPose);
     Logger.recordOutput("Vision/AprilTag/TotalVisionMesurmentsCount", robotObservatons.size());
     Logger.recordOutput("Vision/AprilTag/RejectedPoseCount", robotObservatonsRejected.size());
     Logger.recordOutput(

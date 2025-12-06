@@ -202,12 +202,7 @@ public class Drive extends SubsystemBase {
 
     // update odemtry based on vision
     if (visionPresent && visionObs.get().poseObsGood()) {
-      poseEstimator.addVisionMeasurement(
-          new Pose2d(
-              visionObs.get().poseObs().getX(),
-              visionObs.get().poseObs().getY(),
-              gyroInputs.yawPosition),
-          sampleCount);
+      poseEstimator.addVisionMeasurement(visionObs.get().poseObs(), visionObs.get().timestamp());
     }
   }
 
